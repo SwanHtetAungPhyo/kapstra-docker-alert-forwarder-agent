@@ -1,0 +1,59 @@
+services:
+  alert-agent:
+    build: .
+    container_name: alert-agent
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+      - ./config.yaml:/app/config.yaml:ro
+    environment:
+      - ALERT_AGENT_HEALTH_PORT=8080
+      - ALERT_AGENT_LOG_LEVEL=info
+      - ALERT_AGENT_WEBHOOK_URL=https://your-webhook-url.com/webhook
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - monitoring
+    labels:
+      - "monitor=false"
+
+  alert-ui:
+    build: ./web
+    container_name: alert-ui
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - alert-agent
+    networks:
+      - monitoring
+    labels:
+      - "monitor=false"
+
+  nginx:
+    image: nginx:alpine
+    container_name: test-nginx1
+    ports:
+      - "8082:80"
+    networks:
+      - monitoring
+    labels:
+      - "monitor=true"
+
+  redis:
+    image: redis:alpine
+    container_name: redis_kolektibles
+    ports:
+      - "6379:6379"
+    networks:
+      - monitoring
+    labels:
+      - "monitor=true"
+
+networks:
+  monitoring:
+    driver: bridge

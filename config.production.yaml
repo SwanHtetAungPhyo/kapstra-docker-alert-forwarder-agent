@@ -1,0 +1,36 @@
+server:
+  health_port: 8080
+  log_level: info
+
+docker:
+  host: "unix:///var/run/docker.sock"
+  timeout: 30s
+  retry_interval: 30s
+
+monitoring:
+  container_filters:
+    - "label:monitor=true"
+  log_levels:
+    - "ERROR"
+    - "FATAL"
+    - "PANIC"
+    - "WARN"
+  check_interval: 30s
+  buffer_size: 1000
+
+alerts:
+  destinations:
+    - name: "webhook"
+      type: "webhook"
+      config:
+        url: "${WEBHOOK_URL}"
+        timeout: "10s"
+  
+  rate_limit:
+    per_container: 10
+    window: "5m"
+    burst: 3
+
+logging:
+  level: info
+  format: json

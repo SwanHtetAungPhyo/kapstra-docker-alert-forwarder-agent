@@ -1,0 +1,13 @@
+.git
+.gitignore
+.kiro
+.vscode
+.idea
+README.md
+docker-compose*.yml
+Dockerfile
+*.md
+.env
+.env.*
+monitor/
+main.go

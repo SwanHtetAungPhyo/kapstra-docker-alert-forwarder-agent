@@ -1,0 +1,33 @@
+
+
+services:
+  alert-agent:
+    build: .
+    container_name: alert-agent
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - ALERT_AGENT_HEALTH_PORT=8080
+      - ALERT_AGENT_LOG_LEVEL=info
+      - ALERT_AGENT_DOCKER_HOST=unix:///var/run/docker.sock
+      - ALERT_AGENT_CONTAINER_FILTERS=test-nginx1,redis_kolektibles
+      - ALERT_AGENT_LOG_LEVELS=ERROR,FATAL,PANIC,WARN
+      - ALERT_AGENT_CHECK_INTERVAL=30s
+      - ALERT_AGENT_BUFFER_SIZE=1000
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - monitoring
+    labels:
+      - "monitor=false"
+
+networks:
+  monitoring:
+    driver: bridge
