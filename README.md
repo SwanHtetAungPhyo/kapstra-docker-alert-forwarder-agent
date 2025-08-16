@@ -134,22 +134,6 @@ curl http://localhost:8081/nonexistent-page
 docker logs alert-agent
 ```
 
-## Production Deployment
-
-1. Use the production config:
-```bash
-cp config.production.yaml config.yaml
-```
-
-1. Set webhook URL:
-```bash
-export WEBHOOK_URL="https://kapstra.hooks.com/id"
-```
-
-1. Deploy:
-```bash
-docker-compose up -d
-```
 
 ## Resource Usage
 
